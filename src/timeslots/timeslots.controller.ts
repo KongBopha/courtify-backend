@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { TimeslotsService } from './timeslots.service';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
@@ -10,6 +19,13 @@ export class TimeslotsController {
   @Post()
   create(@Body() createTimeslotDto: CreateTimeslotDto) {
     return this.timeslotsService.create(createTimeslotDto);
+  }
+  @Get('available')
+  findAvailable(
+    @Query('courtId') courtId: number,
+    @Query('date') date: string,
+  ) {
+    return this.timeslotsService.findAvailable(+courtId, date);
   }
 
   @Get()
@@ -23,7 +39,10 @@ export class TimeslotsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTimeslotDto: UpdateTimeslotDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateTimeslotDto: UpdateTimeslotDto,
+  ) {
     return this.timeslotsService.update(+id, updateTimeslotDto);
   }
 

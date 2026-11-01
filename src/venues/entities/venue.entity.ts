@@ -1,38 +1,94 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { User } from 'src/users/entities/user.entity';
+import { Court } from 'src/courts/entities/court.entity';
 import { Booking } from 'src/bookings/entities/booking.entity';
+
+export enum VenueApprovalStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
 
 @Entity('venues')
 export class Venue {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => User, (user) => user.venues, {
+    onDelete: 'CASCADE',
+  })
+  owner: User;
+
   @Column()
   venueName: string;
 
-  @Column()
-  venueImage: string;
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description: string | null;
 
   @Column()
-  venueImageUrl: string;
+  address: string;
 
-  @Column()
-  location: string;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  latitude: number | null;
 
-  @Column('float')
-  distance: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  longitude: number | null;
 
-  @Column()
-  courts: number;
+  @Column({
+    type: 'enum',
+    enum: VenueApprovalStatus,
+    default: VenueApprovalStatus.PENDING,
+  })
+  approvalStatus: VenueApprovalStatus;
 
-  @Column('float')
+  @Column({
+    type: 'float',
+    default: 0,
+  })
   rating: number;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
   })
-  price: number;
+  venueImage: string | null;
 
-  @OneToMany(() => Booking, (booking) => booking.venue)
-  bookings: Booking[];
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  venueImageUrl: string | null;
+
+  @OneToMany(() => Court, (court) => court.venue)
+  courts: Court[];
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../auth/auth.decorator';
 
 @Controller('bookings')
+@UseGuards(JwtAuthGuard)
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
-  create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(createBookingDto);
+  create(
+    @GetUser() user,
+    @Body() dto: CreateBookingDto,
+  ) {
+    return this.bookingsService.createBooking(user, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.bookingsService.findAll();
+  @Get('me')
+  findMyBookings(@GetUser() user) {
+    return this.bookingsService.findUserBookings(user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bookingsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingsService.update(+id, updateBookingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bookingsService.remove(+id);
+  @Post(':id/cancel')
+  cancel(
+    @GetUser() user,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.bookingsService.cancelBooking(id, user.id);
   }
 }

@@ -9,9 +9,9 @@ import { CourtsModule } from './courts/courts.module';
 import { TimeslotsModule } from './timeslots/timeslots.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { PaymentsModule } from './payments/payments.module';
-import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { VenuesModule } from './venues/venues.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [

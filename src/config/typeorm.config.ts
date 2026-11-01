@@ -12,5 +12,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   retryAttempts: 3,
   synchronize: true,  
-  logging: true,
+  logging: ['error', 'warn'],
 };

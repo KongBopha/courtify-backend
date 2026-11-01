@@ -1,25 +1,55 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+
+import { Payment } from 'src/payments/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Venue } from 'src/venues/entities/venue.entity';
+import { TimeSlot } from 'src/timeslots/entities/timeslot.entity';
 
+export enum BookingStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+}
 @Entity('bookings')
-@Index(['venue', 'date', 'startTime', 'endTime'])
 export class Booking {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.bookings, { eager: true })
+  @ManyToOne(() => User, (user) => user.bookings, {
+    eager: true,
+  })
   user: User;
 
-  @ManyToOne(() => Venue, (venue) => venue.bookings, { eager: true })
-  venue: Venue;
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+  })
+  totalPrice: number;
 
-  @Column()
-  date: string;
+  @Column({
+    type: 'enum',
+    enum: BookingStatus,
+    default: BookingStatus.PENDING,
+  })
+  status: BookingStatus;
 
-  @Column()
-  startTime: string;
+  @OneToMany(() => Payment, (payment) => payment.booking)
+  payments: Payment[];
 
-  @Column()
-  endTime: string;
+  @OneToOne(() => TimeSlot, (slot) => slot.booking)
+  @JoinColumn()
+  timeSlot: TimeSlot;
+
+  @CreateDateColumn()
+  created_at: Date;
 }
